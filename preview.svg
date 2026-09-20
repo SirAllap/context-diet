@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="FiraMono Nerd Font, DejaVu Sans Mono, monospace">
+  <defs>
+    <linearGradient id="hot" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7dd3fc"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0d0f16"/>
+
+  <text x="64" y="76" fill="#e6e9ef" font-size="34" font-weight="600">You are not paying for what it writes</text>
+  <text x="64" y="114" fill="#8394a3" font-size="19">You are paying for the conversation so far, read again, every turn.</text>
+
+  <!-- the measurement -->
+  <rect x="64" y="146" width="1072" height="104" rx="14" fill="#161a24" stroke="#262c3a"/>
+  <text x="96" y="186" fill="#a78bfa" font-size="46" font-weight="700">98.2%</text>
+  <text x="96" y="222" fill="#8394a3" font-size="17">of a month, re-read</text>
+  <text x="396" y="186" fill="#e5c07b" font-size="46" font-weight="700">82%</text>
+  <text x="396" y="222" fill="#8394a3" font-size="17">of that on the main thread</text>
+  <text x="760" y="186" fill="#7dd3fc" font-size="46" font-weight="700">37%</text>
+  <text x="760" y="222" fill="#8394a3" font-size="17">is what a 200K cap saves</text>
+
+  <!-- half 1 -->
+  <rect x="64" y="286" width="516" height="242" rx="14" fill="#161a24" stroke="#262c3a"/>
+  <text x="96" y="326" fill="#7dd3fc" font-size="14" letter-spacing="2">THE SCALE · IN AGENTGLASS</text>
+  <text x="96" y="364" fill="#e6e9ef" font-size="21" font-weight="600">A panel that keeps the tally</text>
+  <text x="96" y="400" fill="#8394a3" font-size="17">How many turns read past your cap,</text>
+  <text x="96" y="424" fill="#8394a3" font-size="17">and how much of the re-reading</text>
+  <text x="96" y="448" fill="#8394a3" font-size="17">those few turns carry.</text>
+  <rect x="96" y="472" width="452" height="8" rx="4" fill="#1b2130"/>
+  <rect x="96" y="472" width="416" height="8" rx="4" fill="url(#hot)"/>
+  <text x="96" y="506" fill="#e6e9ef" font-size="16">92% of it sits in the big turns</text>
+
+  <!-- half 2 -->
+  <rect x="620" y="286" width="516" height="242" rx="14" fill="#161a24" stroke="#262c3a"/>
+  <text x="652" y="326" fill="#a78bfa" font-size="14" letter-spacing="2">THE DIET · IN CLAUDE CODE</text>
+  <text x="652" y="364" fill="#e6e9ef" font-size="21" font-weight="600">Three workers that read for you</text>
+  <text x="652" y="402" fill="#8394a3" font-size="17">scout</text>
+  <text x="768" y="402" fill="#e6e9ef" font-size="17">finds it, returns file:line</text>
+  <text x="652" y="432" fill="#8394a3" font-size="17">builder</text>
+  <text x="768" y="432" fill="#e6e9ef" font-size="17">builds it, returns a diff</text>
+  <text x="652" y="462" fill="#8394a3" font-size="17">verifier</text>
+  <text x="768" y="462" fill="#e6e9ef" font-size="17">runs it, returns the counts</text>
+  <text x="652" y="506" fill="#8394a3" font-size="16">Read once there. Never re-read here.</text>
+
+  <rect x="64" y="562" width="1072" height="1" fill="#262c3a"/>
+  <text x="64" y="596" fill="#7dd3fc" font-size="18" font-weight="600">context-diet</text>
+  <text x="238" y="596" fill="#8394a3" font-size="18">one plugin · nothing leaves your machine</text>
+</svg>

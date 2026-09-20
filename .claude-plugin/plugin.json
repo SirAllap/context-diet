@@ -1,0 +1,28 @@
+{
+  "name": "context-diet",
+  "description": "Keeps the expensive thread small. The main thread owns the contract and the acceptance; cheaper workers own repository discovery, implementation, verification and the grunt work. Measured: re-reading the main thread is 98% of a month's tokens.",
+  "author": {
+    "name": "SirAllap",
+    "url": "https://github.com/SirAllap"
+  },
+  "keywords": [
+    "orchestration",
+    "subagents",
+    "context",
+    "cost",
+    "delegation"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/always.md\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

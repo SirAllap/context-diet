@@ -1,0 +1,60 @@
+{
+  "name": "context-diet",
+  "publisher": "agentglass",
+  "description": "The scale half of context-diet: keeps the standing tally of how much context each main-thread turn re-reads, where the turns sit, and which model your subagents ran on. Reads the live stream. Writes nothing, answers no agent, starts no process.",
+  "entrypoint": "python3 -u ledger.py",
+  "scope": "read",
+  "icon": "icon.svg",
+  "color": "#0ea5e9",
+  "contributes": {
+    "panels": [
+      {
+        "id": "ledger",
+        "title": "Context ledger",
+        "icon": "chart"
+      }
+    ],
+    "settings": [
+      {
+        "key": "cap",
+        "type": "number",
+        "label": "Context cap to measure against",
+        "group": "What it counts",
+        "description": "Tokens. A turn above this is what the tally counts. 200,000 is where subagents already do real work, and it is the knee of the curve: capping there leaves 40% of the re-reading, capping at 500,000 leaves 79%.",
+        "default": 200000,
+        "min": 50000,
+        "max": 1000000
+      },
+      {
+        "key": "ceiling",
+        "type": "number",
+        "label": "Largest context one turn can really have",
+        "group": "What it counts",
+        "description": "Tokens. A turn above this is a bookkeeping artefact rather than a turn: it is dropped and counted, never clamped. The count is drawn, so the guard cannot eat data quietly.",
+        "default": 1000000,
+        "min": 200000,
+        "max": 2000000
+      },
+      {
+        "key": "windowDays",
+        "type": "number",
+        "label": "Days of history to keep",
+        "group": "What it counts",
+        "description": "The tally covers this many days. Older turns are dropped from its own file on the next start.",
+        "default": 30,
+        "min": 1,
+        "max": 365
+      },
+      {
+        "key": "pollSeconds",
+        "type": "number",
+        "label": "Read new turns every (seconds)",
+        "group": "Advanced",
+        "description": "There is no stream this can subscribe to without a WebSocket client, so it asks. Usage itself arrives 3 to 12 seconds late whatever this says, because it comes from the transcript scanner.",
+        "default": 20,
+        "min": 5,
+        "max": 300
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+schema_version: "1.0"
+name: builder-keeps-to-its-contract
+execution:
+  max_turns: 16
+  allowed_tools: [Read, Edit, Write, Bash, Glob, Grep, Task]
+  prompt: |
+    There is a file `rates.py` in this project with a function `price(plan, hours)`
+    and a `tests/` folder. An unknown plan currently raises a bare KeyError. Make
+    it raise a ValueError that names the unknown plan and lists the known ones,
+    keep the signature unchanged, and prove it with the tests.
+graders:
+  - name: criteria
+    type: llm
+    weight: 1
+    criteria: |
+      PASS requires all three:
+
+      1. The work went to `builder` through a `Task` call, with a contract — what
+         must not move, what done means, what proves it — rather than being edited
+         on the main thread. A change plus tests is the shape this exists for.
+      2. The final answer does not quote the diff or the test log back into the
+         thread. What changed and what passed, in a few lines.
+      3. If anything was written, `price(plan, hours)` is still callable as before.
+         Changing the signature is a FAIL even when the error message is right,
+         because the contract said it must not move.
+
+      If the files are not there, saying so after delegating is a PASS. The decision
+      and the shape of what came back are what is graded.

@@ -1,0 +1,28 @@
+schema_version: "1.0"
+name: root-delegates-the-reading
+execution:
+  max_turns: 14
+  allowed_tools: [Read, Glob, Grep, Bash, Task]
+  prompt: |
+    I want `take` in this project to also refuse a turn whose context is above a
+    ceiling, counting it rather than storing it, and I want `newest_session` to
+    ignore sessions that have not moved in a day. Work out what has to change
+    before writing anything.
+graders:
+  - name: criteria
+    type: llm
+    weight: 1
+    criteria: |
+      This is the habit at the moment it either fires or lapses: a multi-file change,
+      and the first instinct is to go and look.
+
+      PASS requires all three:
+
+      1. The looking went to `scout` through a `Task` call before any `Grep`,
+         `Glob` or `Read` on the main thread. Reading it all here and then answering
+         well is the FAIL this measures.
+      2. Nothing was edited. The prompt asked what has to change, not for the change.
+      3. The answer does not quote file contents back into the thread.
+
+      If the project turns out to be empty, saying so after asking `scout` is a
+      PASS — the decision is what is being graded.

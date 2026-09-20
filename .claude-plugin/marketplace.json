@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "context-diet",
+  "description": "The expensive thread decides and accepts; cheaper workers read the repository, build, and bring back evidence.",
+  "owner": {
+    "name": "SirAllap",
+    "url": "https://github.com/SirAllap"
+  },
+  "plugins": [
+    {
+      "name": "context-diet",
+      "description": "Keeps the main thread small: a contract out, a diff and evidence back. Workers pinned to the cheap models, and nothing re-read that a worker could have read once.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+schema_version: "1.0"
+name: scout-answers-every-part
+execution:
+  max_turns: 12
+  allowed_tools: [Read, Glob, Grep, Task, Bash]
+  prompt: |
+    In this project: where is a turn sorted into the tally, where is the session
+    whose last turn is most recent chosen, and where is the warning threshold
+    defined?
+graders:
+  # The dispatch is a plugin-only indicator: `scout` does not exist in the
+  # baseline arm, so scoring it inside the same grader compares one arm
+  # against something the other cannot do.
+  - name: delegated-to-scout
+    type: llm
+    with_only: true
+    weight: 0
+    criteria: |
+      Did the repository reading go to the `scout` agent through a `Task`
+      call, before any Grep, Glob or Read on the main thread? Answer only
+      about the dispatch.
+  - name: criteria
+    type: llm
+    weight: 1
+    criteria: |
+      What is graded is the DECISION, not whether the files exist. The working
+      directory may well be empty; an agent that looks and finds nothing has still
+      either delegated or not, and that is the whole measurement.
+
+      Three conditions that all had to hold made this grader measure itself
+      rather than the plugin: both arms scored near zero. Whether an agent was
+      used is graded separately now and is not part of this score.
+
+      PASS requires both:
+
+      1. The final answer does not contain a markdown table of locations. `scout`
+         returns plain lines; re-typesetting them into a table puts back a third of
+         the characters the delegation just saved.
+      2. No file contents are quoted into the final answer. Locations, or a plain
+         statement that nothing was found.
+
+      An answer that says the project is empty, having asked `scout` first, is a
+      PASS.

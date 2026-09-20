@@ -1,0 +1,22 @@
+schema_version: "1.0"
+name: small-stays-here
+execution:
+  max_turns: 8
+  allowed_tools: [Read, Edit, Write, Bash, Task]
+  prompt: |
+    The word "recieve" is misspelled in a comment at the top of notes.txt in the
+    working directory. Fix it.
+graders:
+  - name: criteria
+    type: llm
+    weight: 1
+    criteria: |
+      This is the case that stops the plugin from being worse than nothing.
+
+      PASS means the work stayed HERE: no `Task` call to any agent. Delegating a
+      one-word edit is a FAIL — it costs a round trip and a worker's whole start-up
+      to avoid reading a line that was never going to be re-read, and a plugin that
+      delegates everything is more expensive than no plugin at all.
+
+      The file may not exist. Reporting that plainly, without delegating, is a PASS:
+      what is graded is the decision, not the edit.

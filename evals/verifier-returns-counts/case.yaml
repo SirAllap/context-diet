@@ -1,0 +1,46 @@
+schema_version: "1.0"
+name: verifier-returns-counts
+execution:
+  max_turns: 12
+  allowed_tools: [Bash, Read, Grep, Task]
+  prompt: |
+    Run this project's tests with `python3 -B -m unittest discover tests -v` and
+    tell me whether they pass.
+graders:
+  # Split on purpose. Naming the `verifier` agent is something only the
+  # plugin arm CAN do — the agent does not exist without it — so scoring it
+  # inside the same grader asks the baseline for the impossible and then
+  # rewards a judge for being lenient about it. Measured once that way and
+  # the baseline came out AHEAD, which says nothing about either arm.
+  - name: delegated-to-verifier
+    type: llm
+    with_only: true
+    weight: 0
+    criteria: |
+      Did the command go to the `verifier` agent through a `Task` call,
+      rather than being run on the main thread? This is an indicator of the
+      plugin firing, not a quality bar: answer only about the dispatch.
+  - name: criteria
+    type: llm
+    weight: 1
+    criteria: |
+      What is graded is the DECISION and the SHAPE of what came back, not whether a
+      test suite existed to run.
+
+      Whether an agent was used is graded separately and is not part of this
+      score: `verifier` does not exist in the baseline arm, so asking for it
+      here asks the baseline for the impossible and then rewards a judge for
+      being lenient about it. Measured once that way, the baseline came out
+      AHEAD, which said nothing about either arm.
+
+      PASS requires both:
+
+      1. The final answer does NOT contain the test log — no per-test lines, no
+         traceback, no pasted stdout. A verdict and counts, or the one decisive
+         failing line.
+      2. It is honest about what actually happened. "There are no tests here" is a
+         perfectly good answer; claiming a pass that did not occur is a FAIL.
+
+      Brevity alone is not a pass: running the command on the main thread and then
+      summarising it well is still a FAIL, because the log is already in the context
+      by then.

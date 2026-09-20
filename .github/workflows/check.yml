@@ -1,0 +1,43 @@
+# What a submission is checked for anyway, run on every push, so a broken
+# manifest is found here rather than by somebody trying to install it.
+#
+# The validator is fetched from agentglass rather than vendored: it carries
+# its own copy of the app's rules, and a copy of a copy is the one that drifts.
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The tally, against its own tests
+        # -B because two edits a second apart that leave the file the same
+        # length pass Python's mtime-and-size check, and the run then executes
+        # the previous bytecode while the source says something else.
+        run: python3 -B -m unittest discover tests -v
+
+      - name: The manifest, against the rules the app applies at install
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/SirAllap/agentglass/main/bin/agentglass-plugin -o /tmp/agentglass-plugin
+          python3 /tmp/agentglass-plugin validate .
+
+      - name: It writes nothing of yours
+        # The one promise the README makes that a reader cannot check by
+        # reading: everything it keeps lives in one folder of its own. A path
+        # in Python is built a component at a time, so this looks for the
+        # directory being named at all rather than a contiguous path.
+        run: |
+          if grep -rnE "['\"/]\.(claude|codex|cursor|gemini)\b|['\"/]\.config/|\.(bashrc|zshrc|profile|gitconfig)\b|crontab\s+-" \
+               --include='*.py' --include='*.sh' . ; then
+            echo "::error::Something here names configuration that belongs to the person, not to this plugin."
+            exit 1
+          fi
+          echo "Nothing outside its own folder."
