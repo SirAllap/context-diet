@@ -4,6 +4,10 @@
   "description": "The scale half of context-diet: keeps the standing tally of how much context each main-thread turn re-reads, where the turns sit, and which model your subagents ran on. Reads the live stream. Writes nothing, answers no agent, starts no process.",
   "entrypoint": "python3 -u ledger.py",
   "scope": "read",
+  "sandbox": {
+    "network": "agentglass",
+    "read": ["~/.local/share/context-diet"]
+  },
   "icon": "icon.svg",
   "color": "#0ea5e9",
   "contributes": {

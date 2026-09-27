@@ -240,11 +240,13 @@ class StateTest(unittest.TestCase):
         self.ledger = ledger
         self.tmp = tempfile.TemporaryDirectory()
         root = Path(self.tmp.name)
-        self.saved = (ledger.DATA, ledger.STATE, ledger.LEDGER)
+        self.saved = (ledger.DATA, ledger.STATE, ledger.LEDGER, ledger.OLD_DATA)
         ledger.DATA, ledger.STATE, ledger.LEDGER = root, root / "state.json", root / "ledger.jsonl"
+        # Never the real folder: load() migrates from it.
+        ledger.OLD_DATA = root / "no-old-folder"
 
     def tearDown(self):
-        self.ledger.DATA, self.ledger.STATE, self.ledger.LEDGER = self.saved
+        self.ledger.DATA, self.ledger.STATE, self.ledger.LEDGER, self.ledger.OLD_DATA = self.saved
         self.tmp.cleanup()
 
     def restarted(self, events):
@@ -402,3 +404,42 @@ class AgentModelTest(unittest.TestCase):
         # A new agent with no pin would inherit the session default in silence.
         shipped = {p.stem for p in (ROOT / "agents").glob("*.md")}
         self.assertEqual(shipped, set(self.PINNED))
+
+
+class MigrationTest(unittest.TestCase):
+    """The folder moved when the plugin went into a box: the old one is the
+    only copy of the tally until it has been carried over once."""
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        self.old = Path(self.tmp.name) / "old"
+        self.new = Path(self.tmp.name) / "new"
+        self.old.mkdir()
+        self.new.mkdir()
+        (self.old / "state.json").write_text('{"lastId": 7}')
+        (self.old / "ledger.jsonl").write_text("{}\n")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_an_empty_new_folder_receives_the_old_tally(self):
+        import ledger
+        ledger.migrate(self.old, self.new)
+        self.assertEqual((self.new / "state.json").read_text(), '{"lastId": 7}')
+        self.assertTrue((self.new / "ledger.jsonl").exists())
+
+    def test_a_tally_already_there_is_never_overwritten(self):
+        import ledger
+        (self.new / "state.json").write_text('{"lastId": 99}')
+        ledger.migrate(self.old, self.new)
+        self.assertEqual((self.new / "state.json").read_text(), '{"lastId": 99}')
+
+    def test_a_missing_old_folder_is_not_an_error(self):
+        import ledger
+        ledger.migrate(self.old / "gone", self.new)
+        self.assertFalse((self.new / "state.json").exists())
+
+    def test_the_box_asks_for_the_old_folder_and_no_internet(self):
+        manifest = json.loads((ROOT / "plugin.json").read_text())
+        self.assertEqual(manifest["sandbox"], {"network": "agentglass", "read": ["~/.local/share/context-diet"]})

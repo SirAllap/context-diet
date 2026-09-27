@@ -29,7 +29,11 @@ import tally
 
 BASE = os.environ.get("AGENTGLASS_URL", "http://127.0.0.1:4000").rstrip("/")
 TOKEN = os.environ.get("AGENTGLASS_READ_TOKEN", "")
-DATA = Path(os.environ.get("HOME", str(Path.home()))) / ".local" / "share" / "context-diet"
+# In a box the plugin's own folder is the only place that survives, and the
+# host hands it over as AGENTGLASS_PLUGIN_DATA. Unboxed hosts (macOS, Windows,
+# no bubblewrap) do not set it, and keep the folder this plugin always used.
+OLD_DATA = Path(os.environ.get("HOME", str(Path.home()))) / ".local" / "share" / "context-diet"
+DATA = Path(os.environ.get("AGENTGLASS_PLUGIN_DATA") or OLD_DATA)
 LEDGER = DATA / "ledger.jsonl"
 STATE = DATA / "state.json"
 PANEL = "ledger"
@@ -65,6 +69,20 @@ def log(*a: object) -> None:
         f.write(time.strftime("%Y-%m-%d %H:%M:%S ") + " ".join(str(x) for x in a) + "\n")
 
 
+def migrate(old: Path, new: Path) -> None:
+    """Carry the tally over from the folder this plugin used before it ran in a
+    box. Once, and only into an empty folder: a ledger already here is newer
+    than whatever the old folder holds. The box lists the old folder as a
+    read-only grant, so this works there and is a no-op everywhere else."""
+    if old == new or (new / "state.json").exists() or (new / "ledger.jsonl").exists():
+        return
+    for name in ("ledger.jsonl", "state.json"):
+        try:
+            (new / name).write_bytes((old / name).read_bytes())
+        except OSError:
+            pass
+
+
 class Ledger:
     def __init__(self) -> None:
         self.cfg = dict(tally.DEFAULTS)
@@ -80,6 +98,7 @@ class Ledger:
 
     def load(self) -> None:
         DATA.mkdir(parents=True, exist_ok=True)
+        migrate(OLD_DATA, DATA)
         try:
             saved = json.loads(STATE.read_text())
             self.last_id = int(saved["lastId"])
